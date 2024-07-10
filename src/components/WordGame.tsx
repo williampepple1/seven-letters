@@ -1,3 +1,4 @@
+// src/WordGame.tsx
 import React, { useState, useEffect } from 'react';
 import { words } from '../words';
 import Modal from './Modal';
@@ -87,7 +88,7 @@ const WordGame: React.FC = () => {
   const handleWordClick = (word: string) => {
     setSelectedWord(word);
     setRevealedWord(revealLetters(word, 3));
-    setMessage(`Player ${currentPlayer + 1} selected a word.`);
+    setMessage(''); // Clear any previous messages
     setRandomWords([]); // Clear the word list
     setIsChoosing(false);
     setIsModalOpen(true); // Open modal before the next player can see the word
@@ -130,7 +131,7 @@ const WordGame: React.FC = () => {
         <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
         {!gameOver && !isModalOpen && (
           <>
-            <p className="mb-4">Player {currentPlayer + 1}'s turn </p>
+            <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
             <div className="mb-4">
               {randomWords.length > 0 && randomWords.map((word, index) => (
                 <button
