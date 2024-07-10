@@ -118,7 +118,7 @@ const WordGame: React.FC = () => {
         onContinue={handleContinue}
       />
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">Word Game</h1>
+        <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
         {!gameOver && !isModalOpen && (
           <>
             <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
