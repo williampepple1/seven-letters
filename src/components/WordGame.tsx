@@ -30,8 +30,6 @@ const WordGame: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
-  const [isChoosing, setIsChoosing] = useState<boolean>(true);
-  const [choosingTimeLeft, setChoosingTimeLeft] = useState<number>(10);
 
   useEffect(() => {
     setRandomWords(getRandomWords(7));
@@ -50,32 +48,11 @@ const WordGame: React.FC = () => {
       setInput('');
       setCurrentPlayer((currentPlayer + 1) % 2);
       setRandomWords(getRandomWords(7));
-      setIsChoosing(true);
       setIsModalOpen(true); // Open modal for the next player's turn
     }
 
     return () => clearInterval(timerId);
   }, [timeLeft, selectedWord, currentPlayer]);
-
-  useEffect(() => {
-    let choosingTimerId: NodeJS.Timeout;
-    if (isChoosing && choosingTimeLeft > 0) {
-      choosingTimerId = setInterval(() => {
-        setChoosingTimeLeft(choosingTimeLeft - 1);
-      }, 1000);
-    } else if (isChoosing && choosingTimeLeft === 0) {
-      setMessage('Time to choose a word is up! Switching to the next player.');
-      setSelectedWord(null);
-      setRevealedWord('');
-      setInput('');
-      setCurrentPlayer((currentPlayer + 1) % 2);
-      setRandomWords(getRandomWords(7));
-      setChoosingTimeLeft(10);
-      setIsModalOpen(true); // Open modal for the next player's turn
-    }
-
-    return () => clearInterval(choosingTimerId);
-  }, [choosingTimeLeft, isChoosing, currentPlayer]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -94,7 +71,6 @@ const WordGame: React.FC = () => {
       setInput('');
       setCurrentPlayer((currentPlayer + 1) % 2);
       setRandomWords(getRandomWords(7));
-      setIsChoosing(true);
       setIsModalOpen(true); // Open modal for the next player's turn
 
       if (newScores[currentPlayer] === 7) {
@@ -111,16 +87,13 @@ const WordGame: React.FC = () => {
     setSelectedWord(word);
     setRevealedWord(revealLetters(word, 3));
     setMessage(`Player ${currentPlayer + 1} selected a word.`);
-    setRandomWords([]); // Clear the word list
-    setIsChoosing(false);
+    setRandomWords([]);  // Clear the word list
     setIsModalOpen(true); // Open modal before the next player can see the word
   };
 
   const handleContinue = () => {
     setIsModalOpen(false); // Close the modal when the player clicks continue
-    if (!isChoosing) {
-      setTimeLeft(30); // Start the timer for guessing
-    }
+    setTimeLeft(30); // Start the timer
   };
 
   const handleRestart = () => {
@@ -132,22 +105,16 @@ const WordGame: React.FC = () => {
     setCurrentPlayer(0);
     setMessage('');
     setTimeLeft(0);
-    setChoosingTimeLeft(10);
     setGameOver(false);
-    setIsChoosing(true);
     setIsModalOpen(true); // Open modal for the first player's turn
   };
-
-  const modalContent = isChoosing
-    ? `Player ${currentPlayer + 1}'s turn to choose a word. You have ${choosingTimeLeft} seconds to choose.`
-    : `Player ${((currentPlayer + 1) % 2) + 1}'s turn to guess the word.`;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Modal
         isOpen={isModalOpen}
         title="Next Turn"
-        content={`Player 1 Score: ${playerScores[0]} - Player 2 Score: ${playerScores[1]}\n${modalContent}`}
+        content={`Player 1 Score: ${playerScores[0]} - Player 2 Score: ${playerScores[1]}\nPlayer ${currentPlayer + 1}'s turn`}
         onContinue={handleContinue}
       />
       <div className="text-center">
