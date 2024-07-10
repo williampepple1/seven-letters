@@ -1,3 +1,4 @@
+// src/WordGame.tsx
 import React, { useState, useEffect } from 'react';
 import { words } from '../words';
 import Modal from './Modal';
@@ -77,26 +78,22 @@ const WordGame: React.FC = () => {
         setMessage(`Player ${currentPlayer + 1} wins!`);
       }
     } else {
-      setMessage(`Incorrect! Player ${currentPlayer + 1} loses their turn.`);
-      setSelectedWord(null);
-      setRevealedWord('');
-      setInput('');
-      setCurrentPlayer((currentPlayer + 1) % 2);
-      setRandomWords(getRandomWords(7));
-      setIsModalOpen(true); // Open modal for the next player's turn
+      setMessage('Incorrect! Try again.');
     }
+    setInput('');
   };
 
   const handleWordClick = (word: string) => {
     setSelectedWord(word);
     setRevealedWord(revealLetters(word, 3));
     setMessage(`Player ${currentPlayer + 1} selected a word.`);
-    setTimeLeft(30);
-    setRandomWords([]); // Clear the word list
+    setRandomWords([]);  // Clear the word list
+    setIsModalOpen(true); // Open modal before the next player can see the word
   };
 
   const handleContinue = () => {
     setIsModalOpen(false); // Close the modal when the player clicks continue
+    setTimeLeft(30); // Start the timer
   };
 
   const handleRestart = () => {
@@ -116,12 +113,12 @@ const WordGame: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Modal
         isOpen={isModalOpen}
-        title="7 Letters"
+        title="Next Turn"
         content={`Player 1 Score: ${playerScores[0]} - Player 2 Score: ${playerScores[1]}\nPlayer ${currentPlayer + 1}'s turn`}
         onContinue={handleContinue}
       />
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
+        <h1 className="text-4xl font-bold mb-6">Word Game</h1>
         {!gameOver && !isModalOpen && (
           <>
             <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
