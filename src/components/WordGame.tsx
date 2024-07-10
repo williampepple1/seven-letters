@@ -1,6 +1,6 @@
-// src/WordGame.tsx
 import React, { useState, useEffect } from 'react';
 import { words } from '../words';
+import Modal from './Modal';
 
 const getRandomWords = (num: number) => {
   const shuffled = words.sort(() => 0.5 - Math.random());
@@ -28,6 +28,7 @@ const WordGame: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
 
   useEffect(() => {
     setRandomWords(getRandomWords(7));
@@ -46,6 +47,7 @@ const WordGame: React.FC = () => {
       setInput('');
       setCurrentPlayer((currentPlayer + 1) % 2);
       setRandomWords(getRandomWords(7));
+      setIsModalOpen(true); // Open modal for the next player's turn
     }
 
     return () => clearInterval(timerId);
@@ -68,6 +70,7 @@ const WordGame: React.FC = () => {
       setInput('');
       setCurrentPlayer((currentPlayer + 1) % 2);
       setRandomWords(getRandomWords(7));
+      setIsModalOpen(true); // Open modal for the next player's turn
 
       if (newScores[currentPlayer] === 7) {
         setGameOver(true);
@@ -80,6 +83,7 @@ const WordGame: React.FC = () => {
       setInput('');
       setCurrentPlayer((currentPlayer + 1) % 2);
       setRandomWords(getRandomWords(7));
+      setIsModalOpen(true); // Open modal for the next player's turn
     }
   };
 
@@ -88,7 +92,11 @@ const WordGame: React.FC = () => {
     setRevealedWord(revealLetters(word, 3));
     setMessage(`Player ${currentPlayer + 1} selected a word.`);
     setTimeLeft(30);
-    setRandomWords([]);  // Clear the word list
+    setRandomWords([]); // Clear the word list
+  };
+
+  const handleContinue = () => {
+    setIsModalOpen(false); // Close the modal when the player clicks continue
   };
 
   const handleRestart = () => {
@@ -101,13 +109,20 @@ const WordGame: React.FC = () => {
     setMessage('');
     setTimeLeft(0);
     setGameOver(false);
+    setIsModalOpen(true); // Open modal for the first player's turn
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <Modal
+        isOpen={isModalOpen}
+        title="Next Turn"
+        content={`Player 1 Score: ${playerScores[0]} - Player 2 Score: ${playerScores[1]}\nPlayer ${currentPlayer + 1}'s turn`}
+        onContinue={handleContinue}
+      />
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-6">Word Game</h1>
-        {!gameOver && (
+        {!gameOver && !isModalOpen && (
           <>
             <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
             <div className="mb-4">
