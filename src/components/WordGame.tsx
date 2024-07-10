@@ -29,7 +29,7 @@ const WordGame: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
-  const [isChoosing, setIsChoosing] = useState<boolean>(true);
+  const [isChoosing, setIsChoosing] = useState<boolean>(false); // Player 2 starts choosing
 
   useEffect(() => {
     setRandomWords(getRandomWords(7));
@@ -62,9 +62,9 @@ const WordGame: React.FC = () => {
     e.preventDefault();
     if (input === selectedWord) {
       const newScores = [...playerScores];
-      newScores[currentPlayer] += 1;
+      newScores[(currentPlayer + 1) % 2] += 1; // Increment score for the guessing player
       setPlayerScores(newScores);
-      setMessage(`Correct! Player ${currentPlayer + 1} earned a point.`);
+      setMessage(`Correct! Player ${((currentPlayer + 1) % 2) + 1} earned a point.`);
       setSelectedWord(null);
       setRevealedWord('');
       setTimeLeft(0);
@@ -74,9 +74,9 @@ const WordGame: React.FC = () => {
       setIsChoosing(true);
       setIsModalOpen(true); // Open modal for the next player's turn
 
-      if (newScores[currentPlayer] === 7) {
+      if (newScores[(currentPlayer + 1) % 2] === 7) {
         setGameOver(true);
-        setMessage(`Player ${currentPlayer + 1} wins!`);
+        setMessage(`Player ${((currentPlayer + 1) % 2) + 1} wins!`);
       }
     } else {
       setMessage('Incorrect! Try again.');
@@ -110,7 +110,7 @@ const WordGame: React.FC = () => {
     setMessage('');
     setTimeLeft(0);
     setGameOver(false);
-    setIsChoosing(true);
+    setIsChoosing(false); // Player 2 starts choosing
     setIsModalOpen(true); // Open modal for the first player's turn
   };
 
@@ -130,7 +130,7 @@ const WordGame: React.FC = () => {
         <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
         {!gameOver && !isModalOpen && (
           <>
-            <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
+            <p className="mb-4">Player {currentPlayer + 1}'s turn </p>
             <div className="mb-4">
               {randomWords.length > 0 && randomWords.map((word, index) => (
                 <button
