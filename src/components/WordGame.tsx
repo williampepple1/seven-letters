@@ -74,9 +74,13 @@ const WordGame: React.FC = () => {
         setMessage(`Player ${currentPlayer + 1} wins!`);
       }
     } else {
-      setMessage('Incorrect, try again!');
+      setMessage(`Incorrect! Player ${currentPlayer + 1} loses their turn.`);
+      setSelectedWord(null);
+      setRevealedWord('');
+      setInput('');
+      setCurrentPlayer((currentPlayer + 1) % 2);
+      setRandomWords(getRandomWords(7));
     }
-    setInput('');
   };
 
   const handleWordClick = (word: string) => {
@@ -85,6 +89,18 @@ const WordGame: React.FC = () => {
     setMessage(`Player ${currentPlayer + 1} selected a word.`);
     setTimeLeft(30);
     setRandomWords([]);  // Clear the word list
+  };
+
+  const handleRestart = () => {
+    setRandomWords(getRandomWords(7));
+    setSelectedWord(null);
+    setRevealedWord('');
+    setInput('');
+    setPlayerScores([0, 0]);
+    setCurrentPlayer(0);
+    setMessage('');
+    setTimeLeft(0);
+    setGameOver(false);
   };
 
   return (
@@ -138,7 +154,15 @@ const WordGame: React.FC = () => {
           </>
         )}
         {gameOver && (
-          <p className="text-4xl font-bold text-green-500">{message}</p>
+          <>
+            <p className="text-4xl font-bold text-green-500">{message}</p>
+            <button
+              onClick={handleRestart}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Restart Game
+            </button>
+          </>
         )}
       </div>
     </div>
