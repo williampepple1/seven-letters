@@ -23,30 +23,33 @@ const WordGame: React.FC = () => {
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [revealedWord, setRevealedWord] = useState<string>('');
   const [input, setInput] = useState<string>('');
-  const [score, setScore] = useState<number>(0);
+  const [playerScores, setPlayerScores] = useState<number[]>([0, 0]);
+  const [currentPlayer, setCurrentPlayer] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState<number>(30);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [gameOver, setGameOver] = useState<boolean>(false);
 
   useEffect(() => {
     setRandomWords(getRandomWords(7));
   }, []);
 
   useEffect(() => {
+    let timerId: NodeJS.Timeout;
     if (timeLeft > 0) {
-      const timerId = setInterval(() => {
+      timerId = setInterval(() => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
-
-      return () => clearInterval(timerId);
-    } else {
-      setMessage('Time is up! New word set generated.');
-      setRandomWords(getRandomWords(7));
+    } else if (timeLeft === 0 && selectedWord) {
+      setMessage('Time is up! Switch to the next player.');
       setSelectedWord(null);
       setRevealedWord('');
-      setTimeLeft(30);
       setInput('');
+      setCurrentPlayer((currentPlayer + 1) % 2);
+      setRandomWords(getRandomWords(7));
     }
-  }, [timeLeft]);
+
+    return () => clearInterval(timerId);
+  }, [timeLeft, selectedWord, currentPlayer]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -55,12 +58,21 @@ const WordGame: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (input === selectedWord) {
-      setScore(score + 1);
-      setMessage('Correct! You earned a point.');
-      setRandomWords(getRandomWords(7));
+      const newScores = [...playerScores];
+      newScores[currentPlayer] += 1;
+      setPlayerScores(newScores);
+      setMessage(`Correct! Player ${currentPlayer + 1} earned a point.`);
       setSelectedWord(null);
       setRevealedWord('');
-      setTimeLeft(30);
+      setTimeLeft(0);
+      setInput('');
+      setCurrentPlayer((currentPlayer + 1) % 2);
+      setRandomWords(getRandomWords(7));
+
+      if (newScores[currentPlayer] === 7) {
+        setGameOver(true);
+        setMessage(`Player ${currentPlayer + 1} wins!`);
+      }
     } else {
       setMessage('Incorrect, try again!');
     }
@@ -70,53 +82,64 @@ const WordGame: React.FC = () => {
   const handleWordClick = (word: string) => {
     setSelectedWord(word);
     setRevealedWord(revealLetters(word, 3));
-    setMessage(`You selected: ${word}`);
+    setMessage(`Player ${currentPlayer + 1} selected a word.`);
+    setTimeLeft(30);
+    setRandomWords([]);  // Clear the word list
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
-        <p className="mb-4">Guess the selected word:</p>
-        <div className="mb-4">
-          {randomWords.map((word, index) => (
-            <button
-              key={index}
-              onClick={() => handleWordClick(word)}
-              className={`px-4 py-2 m-2 border rounded ${
-                selectedWord === word ? 'bg-blue-500 text-white' : 'bg-gray-200'
-              }`}
-            >
-              {word}
-            </button>
-          ))}
-        </div>
-        {revealedWord && (
-          <p className="mb-4 text-2xl">
-            {revealedWord.split('').map((char, index) => (
-              <span key={index} className="inline-block w-6">
-                {char}
-              </span>
-            ))}
-          </p>
+        <h1 className="text-4xl font-bold mb-6">Word Game</h1>
+        {!gameOver && (
+          <>
+            <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
+            <div className="mb-4">
+              {randomWords.length > 0 && randomWords.map((word, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleWordClick(word)}
+                  className={`px-4 py-2 m-2 border rounded ${
+                    selectedWord === word ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                  }`}
+                >
+                  {word}
+                </button>
+              ))}
+            </div>
+            {revealedWord && (
+              <p className="mb-4 text-2xl">
+                {revealedWord.split('').map((char, index) => (
+                  <span key={index} className="inline-block w-6">
+                    {char}
+                  </span>
+                ))}
+              </p>
+            )}
+            <form onSubmit={handleSubmit} className="mb-4">
+              <input
+                type="text"
+                value={input}
+                onChange={handleChange}
+                className="border p-2 mr-2"
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                disabled={!selectedWord}
+              >
+                Submit
+              </button>
+            </form>
+            <p className="mb-4">{message}</p>
+            <p className="mb-4">Player 1 Score: {playerScores[0]}</p>
+            <p className="mb-4">Player 2 Score: {playerScores[1]}</p>
+            {selectedWord && <p className="text-2xl text-red-500">Time left: {timeLeft} seconds</p>}
+          </>
         )}
-        <form onSubmit={handleSubmit} className="mb-4">
-          <input
-            type="text"
-            value={input}
-            onChange={handleChange}
-            className="border p-2 mr-2"
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Submit
-          </button>
-        </form>
-        <p className="mb-4">{message}</p>
-        <p className="mb-4">Score: {score}</p>
-        <p className="text-2xl text-red-500">Time left: {timeLeft} seconds</p>
+        {gameOver && (
+          <p className="text-4xl font-bold text-green-500">{message}</p>
+        )}
       </div>
     </div>
   );
