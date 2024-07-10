@@ -1,3 +1,4 @@
+// src/WordGame.tsx
 import React, { useState, useEffect } from 'react';
 import { words } from '../words';
 
@@ -6,9 +7,21 @@ const getRandomWords = (num: number) => {
   return shuffled.slice(0, num);
 };
 
+const revealLetters = (word: string, num: number) => {
+  const wordArray = word.split('');
+  const indices = new Set<number>();
+
+  while (indices.size < num) {
+    indices.add(Math.floor(Math.random() * word.length));
+  }
+
+  return wordArray.map((letter, index) => (indices.has(index) ? letter : '_')).join('');
+};
+
 const WordGame: React.FC = () => {
   const [randomWords, setRandomWords] = useState<string[]>([]);
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  const [revealedWord, setRevealedWord] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [score, setScore] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
@@ -29,6 +42,7 @@ const WordGame: React.FC = () => {
       setMessage('Time is up! New word set generated.');
       setRandomWords(getRandomWords(7));
       setSelectedWord(null);
+      setRevealedWord('');
       setTimeLeft(30);
       setInput('');
     }
@@ -45,6 +59,7 @@ const WordGame: React.FC = () => {
       setMessage('Correct! You earned a point.');
       setRandomWords(getRandomWords(7));
       setSelectedWord(null);
+      setRevealedWord('');
       setTimeLeft(30);
     } else {
       setMessage('Incorrect, try again!');
@@ -54,13 +69,14 @@ const WordGame: React.FC = () => {
 
   const handleWordClick = (word: string) => {
     setSelectedWord(word);
+    setRevealedWord(revealLetters(word, 3));
     setMessage(`You selected: ${word}`);
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">Word Game</h1>
+        <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
         <p className="mb-4">Guess the selected word:</p>
         <div className="mb-4">
           {randomWords.map((word, index) => (
@@ -75,6 +91,15 @@ const WordGame: React.FC = () => {
             </button>
           ))}
         </div>
+        {revealedWord && (
+          <p className="mb-4 text-2xl">
+            {revealedWord.split('').map((char, index) => (
+              <span key={index} className="inline-block w-6">
+                {char}
+              </span>
+            ))}
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="mb-4">
           <input
             type="text"
