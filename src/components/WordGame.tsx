@@ -116,12 +116,12 @@ const WordGame: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Modal
         isOpen={isModalOpen}
-        title="Next Turn"
+        title="7 Letters"
         content={`Player 1 Score: ${playerScores[0]} - Player 2 Score: ${playerScores[1]}\nPlayer ${currentPlayer + 1}'s turn`}
         onContinue={handleContinue}
       />
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-6">Word Game</h1>
+        <h1 className="text-4xl font-bold mb-6">7 Letters</h1>
         {!gameOver && !isModalOpen && (
           <>
             <p className="mb-4">Player {currentPlayer + 1}'s turn</p>
