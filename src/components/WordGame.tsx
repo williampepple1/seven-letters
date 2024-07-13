@@ -56,12 +56,12 @@ const WordGame: React.FC = () => {
   }, [timeLeft, selectedWord, currentPlayer, isModalOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
+    setInput(e.target.value.toLowerCase());
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (input === selectedWord) {
+    if (input.toLowerCase() === selectedWord) {
       const newScores = [...playerScores];
       newScores[(currentPlayer + 1) % 2] += 1; // Increment score for the guessing player
       setPlayerScores(newScores);
