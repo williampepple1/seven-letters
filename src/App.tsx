@@ -1,11 +1,18 @@
 import React from 'react';
 import WordGame from './components/WordGame';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <WordGame />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/game" element={<WordGame />} />
+      </Routes>
+    </Router>
   );
 };
 
