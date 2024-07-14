@@ -12,7 +12,7 @@ const HomePage: React.FC = () => {
             Login with Google
           </Link>
           <Link to="/game" className="block bg-green-500 text-white px-4 py-2 rounded sm:inline-block">
-            Play Game
+            Play as Guest
           </Link>
         </div>
       </div>
