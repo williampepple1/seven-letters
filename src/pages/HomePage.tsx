@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
           <Link to="/login" className="bg-blue-500 text-white px-4 py-2 rounded w-full sm:w-auto sm:flex-1 text-center">
             Login with Google
           </Link>
-          <Link to="/game" className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto sm:flex-1 text-center">
+          <Link to="/guest" className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto sm:flex-1 text-center">
             Play as Guest
           </Link>
         </div>
