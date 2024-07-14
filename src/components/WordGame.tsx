@@ -30,7 +30,8 @@ const WordGame: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
-  const [isChoosing, setIsChoosing] = useState<boolean>(false); // Player 2 starts choosing
+  const [isChoosing, setIsChoosing] = useState<boolean>(true); // Start with choosing a word
+
 
   useEffect(() => {
     setRandomWords(getRandomWords(7));
@@ -111,9 +112,10 @@ const WordGame: React.FC = () => {
     setMessage('');
     setTimeLeft(0);
     setGameOver(false);
-    setIsChoosing(false); // Player 2 starts choosing
+    setIsChoosing(true); // Player 2 starts choosing
     setIsModalOpen(true); // Open modal for the first player's turn
   };
+
 
   const modalContent = isChoosing
     ? `Player ${currentPlayer + 1}'s turn to choose a word.`
@@ -154,21 +156,23 @@ const WordGame: React.FC = () => {
                 ))}
               </p>
             )}
-            <form onSubmit={handleSubmit} className="mb-4">
-              <input
-                type="text"
-                value={input}
-                onChange={handleChange}
-                className="border p-2 mr-2"
-              />
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                disabled={!selectedWord}
-              >
-                Submit
-              </button>
-            </form>
+            {!isChoosing && (
+              <form onSubmit={handleSubmit} className="mb-4">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={handleChange}
+                  className="border p-2 mr-2"
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  disabled={!selectedWord}
+                >
+                  Submit
+                </button>
+              </form>
+            )}
             <p className="mb-4">{message}</p>
             <p className="mb-4">Player 1 Score: {playerScores[0]}</p>
             <p className="mb-4">Player 2 Score: {playerScores[1]}</p>
